@@ -1,0 +1,7 @@
+This librairie provides functions to parse command line options.
+
+examples:
+	./a.out -a -v -t10 --name=toto
+	./a.out -av -t10 --name=toto
+	./a.out -a --verbose -t10 --name=toto
+	./a.out -a --verbose --timer=10 --name=toto
