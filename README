@@ -1,5 +1,20 @@
 This librairie provides functions to parse command line options.
 
+Each option must either start with a single '-', and afterward all letters will
+be considered as one option per letter (-abc eguals -a -b -c).
+A numerical value can be added next to a letter (-abt10 eguals -a -b -t10). A 
+key / value pair will be created.
+
+If you want to use an option name with more than one character, prepend it with
+a double '-' symbol (-abc NOT EGUAL to --abc).
+
+You can also parse key/value pairs, but the value will always be a string 
+(--name=toto ; --DEBUG=ON).
+
+The case is respected, so --name != --NAME != --NaMe.
+
+You cannot add two options with the same name, that will result in an error.
+
 examples:
 	./a.out -a -v -t10 --name=toto
 	./a.out -av -t10 --name=toto

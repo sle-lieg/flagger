@@ -5,7 +5,6 @@
 
 typedef struct	s_flags
 {
-	char			*raw_option;
 	char			*flag;
 	char			*data;
 	struct s_flags	*next;

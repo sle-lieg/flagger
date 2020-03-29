@@ -11,37 +11,61 @@ static t_flags *g_flags;
 */
 static t_flags *make_new_flag()
 {
-	t_flags *new_flag;
+	static t_flags **last = &g_flags;
+	t_flags *ret;
 
-	// TODO
-	return (new_flag)
+	if ((*last = malloc(sizeof(**last))) == NULL)
+	{
+		ft_printf("Parse option error: malloc failed.\n");
+		exit(EXIT_FAILURE);
+	}
+	ft_memset(*last, 0, sizeof(**last));
+	ret = *last;
+	last = &((*last)->next);
+
+	return (ret);
 }
 
 /*
 	opt is a new string from strdup, so when we delete we can free flag.
 	opt[offset] is the '=' sign, so we set it to \0 to split the string.
 */
-static void set_long_flag(t_flags *new_flag, char *opt, int offset)
+static void set_flag(t_flags *new_flag, char *opt, char *data)
 {
-	if (opt == NULL)
-		exit (EXIT_FAILURE);
-	opt[offset] = '\0';
 	new_flag->flag = opt;
-	new_flag->data = opt + offset + 1;
+	new_flag->data = data;
 }
 
 static void get_long_flag(char *opt)
 {
 	t_flags *new_flag;
 	char	*delim;
+	char	*cpy;
 
-	new_flag = make_new_flag();
-	new_flag->raw_option = opt;
+	if ((cpy = ft_strdup(opt)) == NULL)
+	{
+		ft_printf("Parse option error: strdup failed\n");
+		exit(EXIT_FAILURE);
+	}
 
-	if ((delim = ft_strchr(opt, '=')))
-		set_long_flag(new_flag, ft_strdup(opt), delim - opt);
+	if ((delim = ft_strchr(cpy, '=')))
+		*delim = '\0';
+	if (!is_set(cpy))
+	{
+		new_flag = make_new_flag();
+		set_flag(new_flag, cpy, delim);
+	}
 	else
-		new_flag->flag = ft_strdup(opt);
+		free(cpy);
+}
+
+/*
+	This is for parsing options like -a, -abc, -t10
+*/
+void get_short_flag(char **opt)
+{
+	// TODO
+	
 }
 
 static void get_flag(char *opt)
@@ -52,7 +76,7 @@ static void get_flag(char *opt)
 	{
 		while (*opt)
 		{
-			get_flag(&opt);
+			get_short_flag(&opt);
 		}
 	}
 }
