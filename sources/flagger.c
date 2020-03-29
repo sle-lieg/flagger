@@ -26,6 +26,15 @@ static t_flags *make_new_flag()
 	return (ret);
 }
 
+static void check_if_set(char *s)
+{
+	if (is_set(s))
+	{
+		ft_printf("Parse options error: %s is already set\n", s);
+		exit(EXIT_FAILURE);
+	}
+}
+
 /*
 	opt is a new string from strdup, so when we delete we can free flag.
 	opt[offset] is the '=' sign, so we set it to \0 to split the string.
@@ -50,13 +59,34 @@ static void get_long_flag(char *opt)
 
 	if ((delim = ft_strchr(cpy, '=')))
 		*delim = '\0';
-	if (!is_set(cpy))
-	{
-		new_flag = make_new_flag();
-		set_flag(new_flag, cpy, delim);
-	}
-	else
-		free(cpy);
+	check_if_set(cpy);
+	new_flag = make_new_flag();
+	set_flag(new_flag, cpy, delim);
+}
+
+static char *parse_flag(char *opt)
+{
+	char	*flag;
+
+	if (!(flag = malloc(sizeof(*flag) * 2)))
+		exit(EXIT_FAILURE);
+	flag[0] = *opt;
+	flag[1] = '\0';
+	check_if_set(flag);
+
+	return (flag);
+}
+
+static char *parse_data(char *opt, int l)
+{
+	char	*data;
+
+	if (!(data = malloc(sizeof(*data) * (l+1))))
+		exit(EXIT_FAILURE);
+	ft_strncpy(data, *opt, l);
+	data[l] = '\0';
+
+	return (data);
 }
 
 /*
@@ -64,8 +94,25 @@ static void get_long_flag(char *opt)
 */
 void get_short_flag(char **opt)
 {
-	// TODO
-	
+	char	*flag;
+	char	*data;
+	int		l;
+
+	while (**opt)
+	{
+		flag = parse_flag(*opt);
+		(*opt)++;
+		l = 0;
+		while (ft_isdigit( *opt[l] ))
+			++l;
+		if (l > 0)
+			data = parse_data(*opt, l);
+		else
+			data = NULL;
+
+		set_flag(make_new_flag(), flag, data);
+		*opt += (l+1);
+	}
 }
 
 static void get_flag(char *opt)
