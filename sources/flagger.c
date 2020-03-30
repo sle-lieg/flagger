@@ -61,7 +61,7 @@ static void get_long_flag(char *opt)
 		*delim = '\0';
 	check_if_set(cpy);
 	new_flag = make_new_flag();
-	set_flag(new_flag, cpy, delim);
+	set_flag(new_flag, cpy, (delim ? delim + 1 : NULL));
 }
 
 static char *parse_flag(char *opt)
@@ -83,7 +83,7 @@ static char *parse_data(char *opt, int l)
 
 	if (!(data = malloc(sizeof(*data) * (l+1))))
 		exit(EXIT_FAILURE);
-	ft_strncpy(data, *opt, l);
+	ft_strncpy(data, opt, l);
 	data[l] = '\0';
 
 	return (data);
@@ -103,7 +103,7 @@ void get_short_flag(char **opt)
 		flag = parse_flag(*opt);
 		(*opt)++;
 		l = 0;
-		while (ft_isdigit( *opt[l] ))
+		while (ft_isdigit( (*opt)[l] ))
 			++l;
 		if (l > 0)
 			data = parse_data(*opt, l);
@@ -111,12 +111,13 @@ void get_short_flag(char **opt)
 			data = NULL;
 
 		set_flag(make_new_flag(), flag, data);
-		*opt += (l+1);
+		*opt += l;
 	}
 }
 
 static void get_flag(char *opt)
 {
+	++opt;
 	if (*opt == '-')
 		get_long_flag(++opt);
 	else
@@ -128,19 +129,23 @@ static void get_flag(char *opt)
 	}
 }
 
+static int check_flags(char *valid)
+{
+	if (!valid)
+		return (-1);
+	return (0);
+}
+
 int parse_options(int ac, char**av, char *valid)
 {
 	int i;
 
 	i = 1;
-	while (i < ac)
+	while (i < ac && av[i][0] == '-')
 	{
-		if (av[i][0] == '-')
-			get_flag(av[++i]);
-		else
-			break;
+		get_flag(av[i++]);
 	}
-	return (check_flags(valid))
+	return (check_flags(valid));
 }
 
 t_flags *is_set(char *flag)
@@ -150,7 +155,7 @@ t_flags *is_set(char *flag)
 	tmp = g_flags;
 	while (tmp)
 	{
-		if (ft_strcmp(tmp->flags, flag) == 0)
+		if (ft_strcmp(tmp->flag, flag) == 0)
 			return tmp;
 		tmp = tmp->next;
 	}
@@ -164,7 +169,10 @@ void	display_flags_set()
 	tmp = g_flags;
 	while (tmp)
 	{
-		ft_printf("%s\n", tmp->raw_option);
+		if (tmp->data)
+			ft_printf("%s = %s\n", tmp->flag, tmp->data);
+		else
+			ft_printf("%s\n", tmp->flag);
 		tmp = tmp->next;
 	}
 }

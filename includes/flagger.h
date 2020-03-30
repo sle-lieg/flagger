@@ -1,7 +1,7 @@
 #ifndef FLAGGER_HPP
 # define FLAGGER_HPP
 
-#include "libft.h"
+#include "ft_printf.h"
 
 typedef struct	s_flags
 {
